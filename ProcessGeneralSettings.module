@@ -33,7 +33,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 
 	protected static $defaults = array(
 			'rows' => 1,
-			'global' => 'Settings',
+			'global' => 'settings',
 			'api0' => 'site_title',
 			'label0' => 'Site title',
 			'tooltip0' => 'Specify your site title',
@@ -44,7 +44,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 
 
 	public function init() {
-		//load sstyles for backend
+		//load styles for backend
 		if ($this->wire('user')->isLoggedin()) {
 			$root = $this->config->urls->siteModules . __CLASS__;
         	$this->config->styles->prepend($root . '/' . 'SettingsStyles.css');
@@ -55,12 +55,34 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 		}
 		//set api as key with value as value
 		//it makes it callable $settings->key
-		if (isset($this->data['rows'])) {
-			for ($i=0; $i < $this->data['rows']; $i++) { 
-				if (isset($this->data['api'.$i]) && isset($this->data['value'.$i])) {
-					$this->set($this->data['api'.$i], $this->data['value'.$i] );
+		if (!isset($this->data['rows'])) {
+			parent::init();
+			return;
+		}
+		$langData = array();
+		for ($i=0; $i < $this->data['rows']; $i++) { 
+			if (!isset($this->data['api'.$i]) || !isset($this->data['value'.$i])) continue;
+			$value = $this->data['value'.$i];
+			if ($this->user->language) {
+				//if api ends with language name: site_name_polish, add its value to landData array
+				//so if user language is polish calling site_name will return its polish value
+				if (strpos($this->data['api'.$i], '_'.$this->user->language->name) !== false) {
+					//$api without language suffix - site_title
+					$api = str_replace('_'.$this->user->language->name, '', $this->data['api'.$i]);
+					$key = array_search($api, $this->data, true);
+					if ( $key !== false) {
+						//there is a key site_name, get its corresponding value
+						if (isset($this->data[$key])) {
+							$v = $this->data[$key];
+							$langData[$v] = $this->data['value'.$i];
+						}
+					}
 				}
 			}
+			$this->set($this->data['api'.$i], $value);
+		}
+		foreach ($langData as $key => $value) {
+			$this->set($key, $value);
 		}
 		parent::init();
 	}
