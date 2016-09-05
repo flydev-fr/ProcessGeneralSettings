@@ -1,4 +1,4 @@
-# Global settings for ProcessWire 2.8+
+# Global settings for ProcessWire 2.7+
 
 This module provides a solution for keeping general site settings in one place
 
@@ -31,7 +31,7 @@ otherwise site_title.
 
 ## Requirements
 
-This version of the module requires ProcessWire 2.8.  
+This version of the module requires ProcessWire 2.7+  
 
 ---
 
