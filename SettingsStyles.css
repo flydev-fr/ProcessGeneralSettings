@@ -39,6 +39,7 @@
 .asmListItemStatus {
 	right: auto;
 	left: 0;
+	width: 25px;
 }
 
 .trash {

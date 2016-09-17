@@ -90,14 +90,16 @@ $(window).load(function() {
 				var width = $(form).find('#width').attr('value');
 				//change label of asm select item
 				var label = $(form).find('#label').attr('value');
+				var fullLabel = '';
 				if (type == 'Fieldset') {
-					$('li[rel="'+asmID +'"] .asmListItemLabel').text('-- '+label +' --');
+					fullLabel = '-- '+label +' --';
 				} else {	
-					$('li[rel="'+asmID +'"] .asmListItemLabel').text(label +' (' +api +')');
+					fullLabel = label +' (' +api +')';
 				}
+				$('li[rel="'+asmID +'"] .asmListItemLabel').text(fullLabel);
 				//change data in asm option
 				$('option[rel="'+asmID +'"]').text(label).attr('value', api);
-				$('#'+asmID).text(label).attr('value', api);
+				$('#'+asmID).text(fullLabel).attr('value', api);
 				//save to module data
 				moduleData[asmList[asmID]].api = api;
 				moduleData[asmList[asmID]].label = label;
@@ -120,12 +122,12 @@ $(window).load(function() {
 	      	  		}
 	      		},
 	      		close: function() {
-	       // 			$(form).find('#api').val('field');
-	    			// $(form).find('#label').val('New field');
-	    			// $(form).find('#type').val('Text');
-	    			// $(form).find('#width').val('100');
-	    			// $(form).find('#description').val('');
-	    			// $(form).find('#select').val('');
+	       			$(form).find('#api').val('field');
+	    			$(form).find('#label').val('New field');
+	    			$(form).find('#type').val('Text');
+	    			$(form).find('#width').val('100');
+	    			$(form).find('#description').val('');
+	    			$(form).find('#select').val('');
 	      		}
 	    	});
 	    }
