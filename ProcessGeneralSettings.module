@@ -19,7 +19,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 		return array(
 			'title' => __('General site settings', __FILE__),
 			'summary' => __('Module that stores global site settings', __FILE__),
-			'version' => 100,
+			'version' => 110,
 			'permanent' => false, 
 			'autoload' => true,
 			'icon' => 'sliders', 
@@ -32,6 +32,8 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 	}
 
 	protected static $defaults = array(
+			'global' => 'settings',
+			'settings' => '{"0":{"api":"title","label":"Your site title","type":"Text","width":"100","description":"","select":""}}',
 			'rows' => 1,
 			'global' => 'settings',
 			'api0' => 'site_title',
@@ -48,6 +50,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 		if ($this->wire('user')->isLoggedin()) {
 			$root = $this->config->urls->siteModules . __CLASS__;
         	$this->config->styles->prepend($root . '/' . 'SettingsStyles.css');
+        	$this->config->scripts->add($root . '/' . 'SettingsJS.js');
         }
 		//register wire 'global'
 		if (isset($this->data['global'])) {
@@ -55,6 +58,30 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 		}
 		//set api as key with value as value
 		//it makes it callable $settings->key
+		if (!isset($this->data['settings'])) {
+			parent::init();
+			return;
+		}
+
+		$langData = array();
+		$data = json_decode($this->data['settings'], true);
+		foreach ($data as $key => $field) {
+			if (!isset($field['api']) || !isset($field['value'])) continue;
+			$value = $field['value'];
+			if ($this->user->language) {
+				//if api ends with language name: site_name_polish, add its value to langData array
+				//so if user language is polish calling site_name will return its polish value
+				if (strpos($field['api'], '_'.$this->user->language->name) !== false) {
+					//$api without language suffix - site_title
+					$api = str_replace('_'.$this->user->language->name, '', $field['api']);
+					foreach ($data as $k => $f) {
+						if ($f['api'] === $api) {
+							$langData[$api] = $field['value'];
+						}
+					}
+				}
+			 }
+			$this->set($field['api'], $value);
 		if (!isset($this->data['rows'])) {
 			parent::init();
 			return;
@@ -90,7 +117,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 	public function ___execute() {
 		if ($this->input->post('submit_save')) {
 			$this->saveValues();
-			return  $this->renderForm();
+			wire('session')->redirect(wire('page')->url);
 		} else {
 			return $this->renderForm();
 		}
@@ -104,15 +131,15 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 	 */
 	public function render() {
 		$out = '<p>';
-		for ($i=0; $i < $this->data['rows']; $i++) { 
-			if (isset($this->data['api'.$i]) && $this->data['type'.$i] != 'Fieldset') {
-				$v = (isset($this->data['value'.$i])) ? $this->data['value'.$i] : '';
-				$out .= $this->wire('sanitizer')->entities($this->data['label'.$i])
-					. ' ('. $this->data['api'.$i] . ') => ' 
+		foreach (json_decode($this->data['settings'], true) as $key => $field) {
+			if (isset($field['api']) && $field['type'] != 'Fieldset') {
+				$v = (isset($field['value'])) ? $field['value'] : '';
+				$out .= $this->wire('sanitizer')->entities($field['label'])
+					. ' ('. $field['api'] . ') => ' 
 					. $this->wire('sanitizer')->entities($v) . '<br>';
 			}
 		}
-		return $out . '</p>';
+		return $out . var_dump($this->data['settings']).'</p>';
 	}
 
 	/**
@@ -122,35 +149,20 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 	 *
 	 */
 	protected function renderForm() {
-		//build array with field attributes
+		if (!isset($this->data['settings'])) {
+			return 'Create settings in module configuration first.';
+		}
+
 		$data = $this->data;
-		$attrs = array();
-		$count = (isset($data['rows']) ? $data['rows'] : 0);
-		for ($i=0; $i < $count; $i++) { 
-			if (isset($data['api'.$i])) {
-				$select = isset($data['options'.$i]) ? $data['options'.$i] : '';
-				$temp = array('api' => $data['api'.$i],
-						  'label' => $data['label'.$i],
-						  'value' => (isset($data['value'.$i])) ? $data['value'.$i] : '',
-						  'tooltip' => $data['tooltip'.$i],
-						  'type' => $data['type'.$i],
-						  'width' => $data['width'.$i],
-						  'options' => $select,
-				);
-				$attrs[] = $temp;
-			}
+		$attrs = json_decode($data['settings'], true);
+
+		if ($attrs === null) {
+			return 'Error decoding settings data.';
 		}
 
 		$form = $this->modules->get('InputfieldForm'); 
 		$form->attr('id', 'SettingsModule');
 		$form->attr('action', $this->wire('page')->url );
-
-        if (!$count) {
-        	$fieldset = wire('modules')->get("InputfieldFieldset");
-        	$fieldset->label = __('Here you can specify general site settings', __FILE__);
-        	$fieldset->notes= 'First add some settings in module config';
-        	$form->add($fieldset);
-        }
 
         $parent = $form;
 		foreach ($attrs as $fset) {
@@ -162,7 +174,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
         	}
         	//set attrbs for all type of fields
 			$field->label =$fset['label'];
-			$field->columnWidth = intval($fset['width']);
+			$field->columnWidth = (intval($fset['width']) >=10) ? $fset['width'] : 100;
 
         	if ($fset['type'] == 'Checkbox' && $value === '1') {
         		$field->setAttribute('checked', 'checked'); 
@@ -171,7 +183,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 				$field->set('noRelative', 1);
 			}
 			if ($fset['type'] == 'Select' || $fset['type'] == 'Radios') {
-				foreach (explode(',', trim($fset['options'], ',')) as $label) {
+				foreach (explode(',', trim($fset['select'], ',')) as $label) {
 					//value, label, attr
 					$v = $this->wire('sanitizer')->name($label);
 					if ($value == $v) {
@@ -183,13 +195,13 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 			}
 			//fieldset or normal field
 			if ($fset['type'] == 'Fieldset') {
-				$field->description = $fset['tooltip'];
+				$field->description = $fset['description'];
 				$field->addClass('fset_red');
 				$parent = $field;
 				$form->append($field);
 			} else {
  	        	$field->attr('name', $fset['api']);
-	        	$field->notes = $fset['tooltip'];
+	        	$field->notes = $fset['description'];
 	        	$field->attr('value', $value); 
 	        	$parent->append($field);
 	        }
@@ -211,127 +223,78 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 	 * 
 	 */
 	protected function saveValues() {
-		//$data = $this->data;
-		for ($i=0; $i < $this->data['rows']; $i++) { 
-			//delete value in case other field was converted to fieldset
-			if ($this->data['type'.$i] == 'Fieldset') {
-				$this->data['value'.$i] = '';
-			} else if ($this->wire('input')->{$this->data['api'.$i]}) {
-				$v = $this->wire('sanitizer')->text($this->wire('input')->{$this->data['api'.$i]});
-				$this[ 'value'.$i] = $v;
+		$old = $this->data;
+		$data = json_decode($old['settings'], true);
+		$new = array();
+		foreach ($data as $key => $field) {
+			$new[$key] = $field;
+			if ($this->wire('input')->{$field['api']}) {
+				$v = $this->wire('sanitizer')->text($this->wire('input')->{$field['api']});
+				$new[$key]['value'] = $v;
 			}
 		}
-		wire('modules')->saveModuleConfigData($this, $this->data); 
+		$old['settings'] = json_encode($new);
+		wire('modules')->saveModuleConfigData($this, $old); 
 		$this->message('Successfully saved site settings');	
 	}
 
 	static public function getModuleConfigInputfields(array $data) {
 		$data = array_merge(self::$defaults, $data);
+		$options = array();
+		$values = array();
+		$json = (isset( $data['settings'] )) ? json_decode($data['settings'], true) : '';
+		foreach ($json as $key => $value) {
+			if ($value['type'] == 'Fieldset') {
+				$options[$value['api']] ='-- '. $value['label'] . ' --';
+			} else {
+				$options[$value['api']] = $value['label'] . ' ('. $value['api'] .')';
+			}
+			$values[] = $value['api'];
+		}
 
+		$order = array();
         $fields = new InputfieldWrapper();
         $modules = wire('modules');
 
-        $field = $modules->get("InputfieldInteger");
-        $field->attr('name', 'rows');
-        $field->label = __("Number of settings", __FILE__);
-        $field->attr('value', $data['rows']); 
-        $field->description = __("How many global page settings are needed.", __FILE__);
-        $field->notes = __("After changing click save to reload a page.", __FILE__);
-        $field->columnWidth = 50;
+        $field = $modules->get("InputfieldMarkup");
+        $field->label = __("Help", __FILE__);
+        $help = ('<b>API variable</b> - Any combination of letters (a-z), numbers (0-9) and underscores (no spaces). 
+        		You can call it in template files to output a value ($settings->site_name will return "My site").
+        		<br>IMPORTANT: take care to not overload ProcessWire properties ($page, $user, etc.)<br>
+        		<b>Label</b> - descriptive name for a backend user<br>
+        		<b>Description</b> - longer explanation shown as notes in ProcessWire backend<br>
+        		<b>Width</b> - field width in %, set between 10 and 100<br>
+        		<b>Options for select or radios</b> - this will be used as names and labels, the best one word only');
+        $field->entityEncodeText = false;
+        $field->entityEncodeLabel = false;
+        $field->attr('value', $help); 
+        $field->collapsed = Inputfield::collapsedYes;
         $fields->append($field);
 
         $field = $modules->get("InputfieldText");
         $field->attr('name', 'global');
         $field->label = __("Global name", __FILE__);
         $field->attr('value', $data['global']); 
-        $field->description = __('Use to call settings property in frontend ($Settings->property).', __FILE__);
+        $field->description = __('Use to call settings property in frontend ($settings->property).', __FILE__);
         $field->notes = __("After changing make sure to change it in your template files.", __FILE__);
-        $field->columnWidth = 50;
+        $field->collapsed = Inputfield::collapsedYes;
         $fields->append($field);
 
-
-        $field = $modules->get("InputfieldMarkup");
-        //$field->attr('name', 'rows');
-        $field->label = __("Help", __FILE__);
-        $help = __('<b>Property name</b> - Any combination of letters (a-z), numbers (0-9) and underscores (no spaces). You can call it in template files to output a value ($Settings->site_name will return "My site").
-        		<br>IMPORTANT: take care to not overload ProcessWire properties ($page, $user, etc.)<br>
-        		<b>Label</b> - descriptive name for a backend user<br>
-        		<b>Description</b> - longer explanation shown as notes in ProcessWire backend', __FILE__);
-        $field->attr('value', $help); 
+        $field = wire('modules')->get("InputfieldTextarea");
+        $field->attr('name', 'settings');
+        $field->attr('id', 'settings');
+        $field->label = __("Json data", __FILE__);
+        $field->attr('value', $data['settings']); 
+        $field->columnWidth = 34;
         $fields->append($field);
 
-        for ($i=0; $i < $data['rows']; $i++) { 
-        	$fset = wire('modules')->get("InputfieldFieldset");
-        	$fset->addClass('fset_red');
-        	$fset->label =  ((isset( $data['label'.$i] )) ? $data['label'.$i] : 'New') . ' settings';
-
-        	$field = $modules->get("InputfieldName");
-	        $field->attr('name', 'api'.$i); //this will be post var name
-	        $field->label = __("Property name", __FILE__);
-	        $field->attr('value', (isset( $data['api'.$i] )) ? $data['api'.$i] : 'option'.$i ); 
-	        $field->description = '';
-	        $field->columnWidth = 33;
-	        $field->showIf = "type$i!=Fieldset";
-	        $fset->append($field);
-
-	        $field = $modules->get("InputfieldText");
-	        $field->attr('name', 'label'.$i);
-	        $field->label = __("Label", __FILE__);
-	        $field->attr('value', (isset( $data['label'.$i] )) ? $data['label'.$i] : ''); 
-	        $field->columnWidth = 34;
-	        $fset->append($field);
-
-	        $field = $modules->get("InputfieldSelect");
-	        $field->attr('name', 'type'.$i);
-	        $field->label = __("Field type", __FILE__);
-	        $field->attr('value', (isset( $data['type'.$i] )) ? $data['type'.$i] : 'Text'); 
-	        $field->addOption('Text');
-	        $field->addOption('Select');
-	        $field->addOption('Radios');
-	        $field->addOption('Checkbox');
-	        $field->addOption('Integer');
-	        $field->addOption('Float');
-	        $field->addOption('URL');
-	        $field->addOption('Email');
-	        $field->addOption('Fieldset');
-	        $field->columnWidth = 18;
-	        $fset->append($field);
-
-		    $field = $modules->get("InputfieldInteger");
-	        $field->attr('name', 'width'.$i);
-	        $field->label = __("Field width %", __FILE__);
-	        $field->attr('value', (isset($data['width'.$i])) ? intval($data['width'.$i]) : 50 ); 
-	        $field->columnWidth = 15;
-	        $fset->append($field);
-
-	        $field = $modules->get("InputfieldText");
-	        $field->attr('name', 'options'.$i);
-	        $field->label = __("Options", __FILE__);
-	        $field->description = "Provide comma separated values";
-	        $field->attr('value', (isset( $data['options'.$i] )) ? $data['options'.$i] : ''); 
-	        $field->columnWidth = 100;
-	        $field->showIf = "type$i=Select|Radios";
-	        $fset->append($field);
-
-	       	$field = $modules->get("InputfieldText");
-	        $field->attr('name', 'tooltip'.$i);
-	        $field->label = __("Description", __FILE__);
-	        $field->attr('value', (isset( $data['tooltip'.$i] )) ? $data['tooltip'.$i] : ''); 
-	        $field->columnWidth = 70;
-	        $fset->append($field);
-
-	       	// $field = $modules->get("InputfieldSelect");
-	        // $field->attr('name', 'action'.$i);
-	        // $field->label = __("Admin actions", __FILE__);
-	        // $field->addOption('Delete');
-	        // $field->addOption('Insert below');
-	        // $field->addOption('Copy');
-	        // $field->attr('value', (isset( $data['action'.$i] )) ? $data['action'.$i] : ''); 
-	        // $field->columnWidth = 30;
-	        // $fset->append($field);
-
-	        $fields->append($fset);
-        }
+	   	$field = $modules->get("InputfieldAsmSelect");
+        $field->attr('name', 'order');
+        $field->attr('id', 'ASMOrder');
+        $field->label = __("Settings", __FILE__);
+        $field->addOptions($options);
+        $field->attr('value', $values); 
+        $fields->append($field);
 
         return $fields;
     }

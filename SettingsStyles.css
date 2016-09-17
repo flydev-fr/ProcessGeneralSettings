@@ -1,3 +1,60 @@
-.fset_red > .InputfieldHeader{
+.fset_red > .InputfieldHeader,
+.fset_red > .InputfieldHeader:hover{
 	color: #bc283d;
+}
+
+#modalForm {
+	padding: 15px;
+	overflow: hidden;
+}
+
+#modalForm input,
+#modalForm select {
+	margin-bottom: 10px;
+	width: 100%;
+}
+
+#modalForm {
+	display: none;
+}
+
+.asmListItemStatus a {
+	border: none !important;
+	right: auto;
+	left: 0;
+}
+
+.asmListItemStatus span.ui-button-text {
+	padding: 0 3px;
+}
+
+.asmListItemLabel{
+	margin-left: 55px;
+}
+
+.asmListItemHandle {
+	left: 30px !important;
+}
+
+.asmListItemStatus {
+	right: auto;
+	left: 0;
+}
+
+.trash {
+	margin-right: 10px;
+}
+
+#addNew {
+	display: block;
+	margin-top: 10px;
+	font-size: 110%;
+}
+
+#tips {
+	color: #e83561;
+}
+
+#wrap_settings {
+	display: none;
 }

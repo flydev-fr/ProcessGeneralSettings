@@ -19,9 +19,9 @@ You can change global name ($settings) to something else in module configuration
 
 To get basic markup with all settings and their values use $settings->render().
 
-Current limitation: 
--no way to change order of settings,
--new settings can be only appended,
+## Requirements
+
+This version of the module requires ProcessWire 2.7+ 
 
 ##Multilanguage
 To make fields multilanguage aware create a field with a same property name with '_languageName' appended.
@@ -29,9 +29,6 @@ Example: Your site has two languages: default and french, create site_title and 
 Put in a template $settings->site_title. If a user has set french language, this module output site_title_french, 
 otherwise site_title.
 
-## Requirements
-
-This version of the module requires ProcessWire 2.7+  
 
 ---
 
