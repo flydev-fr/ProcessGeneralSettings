@@ -96,8 +96,8 @@ $(window).load(function() {
 					$('li[rel="'+asmID +'"] .asmListItemLabel').text(label +' (' +api +')');
 				}
 				//change data in asm option
-				$('option[rel="'+asmID +'"]').text(label);
-				$('option[rel="'+asmID +'"]').attr('value', api);
+				$('option[rel="'+asmID +'"]').text(label).attr('value', api);
+				$('#'+asmID).text(label).attr('value', api);
 				//save to module data
 				moduleData[asmList[asmID]].api = api;
 				moduleData[asmList[asmID]].label = label;
@@ -120,12 +120,12 @@ $(window).load(function() {
 	      	  		}
 	      		},
 	      		close: function() {
-	       			$(form).find('#api').val('field');
-	    			$(form).find('#label').val('New field');
-	    			$(form).find('#type').val('Text');
-	    			$(form).find('#width').val('100');
-	    			$(form).find('#description').val('');
-	    			$(form).find('#select').val('');
+	       // 			$(form).find('#api').val('field');
+	    			// $(form).find('#label').val('New field');
+	    			// $(form).find('#type').val('Text');
+	    			// $(form).find('#width').val('100');
+	    			// $(form).find('#description').val('');
+	    			// $(form).find('#select').val('');
 	      		}
 	    	});
 	    }
@@ -141,29 +141,30 @@ $(window).load(function() {
 	    $( ".edit" ).button().on( "click", edit);
 
 		$('#addNew').on("click", function(event) {
-			event.preventDefault();
+			// event.preventDefault();
 			$.get( $(this).attr('href'), function(data) {
-			  		var $option = $("<option></option>").text('New field').attr('value', 'new_field').attr("selected", true); 
-			  		$('#wrap_ASMOrder select').append($option).change();
-
-			  		var labelObj = $('#wrap_ASMOrder').last('.asmListItem');
-	    			asmID = $('#wrap_ASMOrder .asmListItem:last-of-type').attr('rel');
-	    			asmList[asmID] = count +1; 
-	    			moduleData[asmList[asmID]] = {'api': ''};
-			  		//open edit dialog
-			  		form = $('#modalForm');
-			  		createDialog();
-			  		//hide select options
-			  		select('anything');
-	      			dialog.dialog( "open" );
-				})
-			  	.fail(function() {
-			    	alert('Error adding new fields.');
-			  	})
-			  	.always(function() {
-			  		$('.asmListItemStatus').append('<a class="edit" href="#"><i class="fa fa-pencil" aria-hidden="true"></i></a>');
-			  		$('.edit').button().bind('click', edit);
-				});
+			  		//var $option = $("<option></option>").text('New field').attr('value', 'new_field').attr("selected", true); 
+		  		$('#ASMOrder').append($("<option></option>").text('New field').attr('value', 'new_field').attr("selected", true));
+				$('#ASMOrder').change();
+		  		var labelObj = $('#wrap_ASMOrder').last('.asmListItem');
+    			asmID = $('#wrap_ASMOrder .asmListItem:last-of-type').attr('rel');
+    			count= count + 1
+    			asmList[asmID] = count; 
+    			moduleData[asmList[asmID]] = {'api': ''};
+		  		//open edit dialog
+		  		form = $('#modalForm');
+		  		createDialog();
+		  		//hide select options
+		  		select('anything');
+      			dialog.dialog( "open" );
+			})
+		  	.fail(function() {
+		    	alert('Error adding new fields.');
+		  	})
+		  	.always(function() {
+		  		$('.asmListItemStatus').append('<a class="edit" href="#"><i class="fa fa-pencil" aria-hidden="true"></i></a>');
+		  		$('.edit').button().bind('click', edit);
+			});
 			return false;
 		});
 		$('#ModuleEditForm').on('submit', function(event) {
