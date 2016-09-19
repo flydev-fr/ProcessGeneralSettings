@@ -143,32 +143,25 @@ $(window).load(function() {
 	    $( ".edit" ).button().on( "click", edit);
 
 		$('#addNew').on("click", function(event) {
-			// event.preventDefault();
-			$.get( $(this).attr('href'), function(data) {
-			  		//var $option = $("<option></option>").text('New field').attr('value', 'new_field').attr("selected", true); 
-		  		$('#ASMOrder').append($("<option></option>").text('New field').attr('value', 'new_field').attr("selected", true));
-				$('#ASMOrder').change();
-		  		var labelObj = $('#wrap_ASMOrder').last('.asmListItem');
-    			asmID = $('#wrap_ASMOrder .asmListItem:last-of-type').attr('rel');
-    			count= count + 1
-    			asmList[asmID] = count; 
-    			moduleData[asmList[asmID]] = {'api': ''};
-		  		//open edit dialog
-		  		form = $('#modalForm');
-		  		createDialog();
-		  		//hide select options
-		  		select('anything');
-      			dialog.dialog( "open" );
-			})
-		  	.fail(function() {
-		    	alert('Error adding new fields.');
-		  	})
-		  	.always(function() {
-		  		$('.asmListItemStatus').append('<a class="edit" href="#"><i class="fa fa-pencil" aria-hidden="true"></i></a>');
-		  		$('.edit').button().bind('click', edit);
-			});
+	  		$('#ASMOrder').append($("<option></option>").text('New field').attr('value', 'new_field').attr("selected", true));
+			$('#ASMOrder').change();
+	  		var labelObj = $('#wrap_ASMOrder').last('.asmListItem');
+			asmID = $('#wrap_ASMOrder .asmListItem:last-of-type').attr('rel');
+			count= count + 1
+			asmList[asmID] = count; 
+			moduleData[asmList[asmID]] = {'api': ''};
+	  		//open edit dialog
+	  		form = $('#modalForm');
+	  		createDialog();
+	  		//hide select options
+	  		select('anything');
+  			dialog.dialog( "open" );
+
+	  		$('.asmListItemStatus').append('<a class="edit" href="#"><i class="fa fa-pencil" aria-hidden="true"></i></a>');
+	  		$('.edit').button().bind('click', edit);
 			return false;
 		});
+
 		$('#ModuleEditForm').on('submit', function(event) {
 			//change order if needed and save
 			var newOrdered = {};

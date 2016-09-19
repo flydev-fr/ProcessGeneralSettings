@@ -48,13 +48,14 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 		if (isset($this->data['global'])) {
 			$this->wire($this->data['global'], $this);
 		}
-		//set api as key with value as value
-		//it makes it callable $settings->key
+
 		if (!isset($this->data['settings'])) {
 			parent::init();
 			return;
 		}
 
+		//set api as key with value as value
+		//it makes it callable $settings->key
 		$langData = array();
 		$data = json_decode($this->data['settings'], true);
 		foreach ($data as $key => $field) {
@@ -83,8 +84,8 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 
 	public function ___execute() {
 		if ($this->input->post('submit_save')) {
-			$this->saveValues();
-			wire('session')->redirect(wire('page')->url);
+			return $this->renderForm($this->saveValues());
+			//wire('session')->redirect(wire('page')->url);
 		} else {
 			return $this->renderForm();
 		}
@@ -106,7 +107,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 					. $this->wire('sanitizer')->entities($v) . '<br>';
 			}
 		}
-		return $out . var_dump($this->data['settings']).'</p>';
+		return $out .'</p>';
 	}
 
 	/**
@@ -115,14 +116,13 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 	 * @return string form markup
 	 *
 	 */
-	protected function renderForm() {
+	protected function renderForm($settings=null) {
 		if (!isset($this->data['settings'])) {
 			return 'Create settings in module configuration first.';
 		}
 
 		$data = $this->data;
-		$attrs = json_decode($data['settings'], true);
-
+		$attrs = json_decode( $settings ?:$data['settings'], true);
 		if ($attrs === null) {
 			return 'Error decoding settings data.';
 		}
@@ -145,7 +145,8 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 
         	if ($fset['type'] == 'Checkbox' && $value === '1') {
         		$field->setAttribute('checked', 'checked'); 
-        	}
+        		$field->uncheckedValue = '0';
+        	} 
         	if ($fset['type'] == 'URL') {
 				$field->set('noRelative', 1);
 			}
@@ -160,6 +161,10 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 					}
 				}
 			}
+			if ($fset['type'] == 'Integer') {
+				$field->setAttribute('type', 'number');
+			}
+
 			//fieldset or normal field
 			if ($fset['type'] == 'Fieldset') {
 				$field->description = $fset['description'];
@@ -195,14 +200,12 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 		$new = array();
 		foreach ($data as $key => $field) {
 			$new[$key] = $field;
-			if ($this->wire('input')->{$field['api']}) {
-				$v = $this->wire('sanitizer')->text($this->wire('input')->{$field['api']});
-				$new[$key]['value'] = $v;
-			}
+			$new[$key]['value'] = $this->wire('input')->{$field['api']};
 		}
 		$old['settings'] = json_encode($new);
 		wire('modules')->saveModuleConfigData($this, $old); 
-		$this->message('Successfully saved site settings');	
+		$this->message('Site settings saved');	
+		return $old['settings'];
 	}
 
 	static public function getModuleConfigInputfields(array $data) {
