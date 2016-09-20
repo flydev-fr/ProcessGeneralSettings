@@ -39,7 +39,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 
 	public function init() {
 		//load styles for backend
-		if ($this->wire('user')->isLoggedin()) {
+		if ($this->wire('user')->isLoggedin() && $this->input->get('name') == __CLASS__) {
 			$root = $this->config->urls->siteModules . __CLASS__;
         	$this->config->styles->prepend($root . '/' . 'SettingsStyles.css');
         	$this->config->scripts->add($root . '/' . 'SettingsJS.js');
