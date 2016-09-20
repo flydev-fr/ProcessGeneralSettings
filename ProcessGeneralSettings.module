@@ -215,9 +215,9 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 		$json = (isset( $data['settings'] )) ? json_decode($data['settings'], true) : '';
 		foreach ($json as $key => $value) {
 			if ($value['type'] == 'Fieldset') {
-				$options[$value['api']] ='-- '. $value['label'] . ' --';
+				$options[$value['api']] ='-- '. $value['label'] . ' -- ' . $value['width'] . '%';
 			} else {
-				$options[$value['api']] = $value['label'] . ' ('. $value['api'] .')';
+				$options[$value['api']] = $value['label'] . ' ('. $value['api'] .') - ' . $value['width'] . '%';
 			}
 			$values[] = $value['api'];
 		}
@@ -230,7 +230,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
         $field->label = __("Help", __FILE__);
         $help = ('<b>API variable</b> - Any combination of letters (a-z), numbers (0-9) and underscores (no spaces). 
         		You can call it in template files to output a value ($settings->site_name will return "My site").
-        		<br>IMPORTANT: take care to not overload ProcessWire properties ($page, $user, etc.)<br>
+        		<br>IMPORTANT: take care to not overload ProcessWire properties ($page, $user, etc.). It must be unique across all settings.<br>
         		<b>Label</b> - descriptive name for a backend user<br>
         		<b>Description</b> - longer explanation shown as notes in ProcessWire backend<br>
         		<b>Width</b> - field width in %, set between 10 and 100<br>

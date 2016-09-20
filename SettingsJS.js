@@ -92,9 +92,9 @@ $(window).load(function() {
 				var label = $(form).find('#label').attr('value');
 				var fullLabel = '';
 				if (type == 'Fieldset') {
-					fullLabel = '-- '+label +' --';
+					fullLabel = '-- '+label +' -- ' + width+'%';
 				} else {	
-					fullLabel = label +' (' +api +')';
+					fullLabel = label +' (' +api +') - '+ width+'%';
 				}
 				$('li[rel="'+asmID +'"] .asmListItemLabel').text(fullLabel);
 				//change data in asm option
