@@ -9,7 +9,7 @@ $(window).load(function() {
     	+'<label for="api">API variable</label> <input type="text" name="api" id="api" value="" required class="text ui-widget-content ui-corner-all"><br>'
       	+'<label for="label">Label</label><input type="text" name="label" id="label" value="" required class="text ui-widget-content ui-corner-all"><br>'
         +'<label for="type">Type</label><select type="text" name="type" id="type" class="text ui-widget-content ui-corner-all">'
-        +'<option>Text</option><option>Select</option><option>Radios</option><option>Checkbox</option><option>Integer</option><option>Float</option>'
+        +'<option>Text</option><option>Textarea</option><option>Select</option><option>Radios</option><option>Checkbox</option><option>Integer</option><option>Float</option>'
         +'<option>URL</option><option>Email</option><option>Fieldset</option></select><br>'
         +'<label for="width">Width in %</label><input type="number" max="100" min="10" name="width" id="width" value="100" class="text ui-widget-content ui-corner-all"><br>'
         +'<label for="description">Description</label><input type="text" name="description" id="description" value="" class="text ui-widget-content ui-corner-all"><br>'
