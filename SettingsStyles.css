@@ -18,6 +18,10 @@
 	display: none;
 }
 
+#modalForm .ui-state-error {
+	border: 1px solid #cd0a0a !important;
+}
+
 .asmListItemStatus a {
 	border: none !important;
 	right: auto;
