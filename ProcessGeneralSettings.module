@@ -59,8 +59,13 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 		$langData = array();
 		$data = json_decode($this->data['settings'], true);
 		foreach ($data as $key => $field) {
-			if (!isset($field['api']) || !isset($field['value'])) continue;
-			$value = ($field['type'] == 'Textarea') ? nl2br($field['value']) : $field['value'];
+			if (!isset($field['api'])) continue;
+
+			$value = (isset($field['value']) ? $field['value'] : '');
+			if ($field['type'] == 'Textarea') {
+				$value = nl2br($value);
+			}
+
 			if ($this->user->language) {
 				//if api ends with language name: site_name_polish, add its value to langData array
 				//so if user language is polish calling site_name will return its polish value
@@ -143,9 +148,11 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 			$field->label =$fset['label'];
 			$field->columnWidth = (intval($fset['width']) >=10) ? $fset['width'] : 100;
 
-        	if ($fset['type'] == 'Checkbox' && $value === '1') {
-        		$field->setAttribute('checked', 'checked'); 
-        		$field->uncheckedValue = '0';
+        	if ($fset['type'] == 'Checkbox') {
+				$field->uncheckedValue = '0';
+        		if($value === '1') {
+        			$field->setAttribute('checked', 'checked'); 
+        		}
         	} 
         	if ($fset['type'] == 'URL') {
 				$field->set('noRelative', 1);
