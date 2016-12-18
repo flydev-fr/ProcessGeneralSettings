@@ -19,7 +19,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 		return array(
 			'title' => __('General site settings', __FILE__),
 			'summary' => __('Module that stores global site settings', __FILE__),
-			'version' => 112,
+			'version' => 113,
 			'permanent' => false, 
 			'autoload' => true,
 			'icon' => 'sliders', 
