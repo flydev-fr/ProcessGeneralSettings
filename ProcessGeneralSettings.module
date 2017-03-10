@@ -19,7 +19,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 		return array(
 			'title' => __('General site settings', __FILE__),
 			'summary' => __('Module that stores global site settings', __FILE__),
-			'version' => 113,
+			'version' => 121,
 			'permanent' => false, 
 			'autoload' => true,
 			'icon' => 'sliders', 
@@ -32,7 +32,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 	}
 
 	protected static $defaults = array(
-			'global' => 'settings',
+			'global' => 'g_settings',
 			'settings' => '{"0":{"api":"title","label":"Your site title","type":"Text","width":"100","description":"","select":""}}',
 	);
 
@@ -122,11 +122,13 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 	 *
 	 */
 	protected function renderForm($settings=null) {
+		//bd($this->data);
 		if (!isset($this->data['settings'])) {
 			return 'Create settings in module configuration first.';
 		}
 
 		$data = $this->data;
+
 		$attrs = json_decode( $settings ?:$data['settings'], true);
 		if ($attrs === null) {
 			return 'Error decoding settings data.';
@@ -140,20 +142,49 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 		foreach ($attrs as $fset) {
         	$field = $this->modules->get('Inputfield'.$fset['type']);
         	$value = (isset($fset['value']) ? $fset['value'] : '');
+
+        	//------- NEW --------
+        	if($fset['type'] == 'FieldsetClose') {
+				$parent = $form;
+				continue;
+			}
+			//------- END NEW --------
+
         	if (!$field) {
         		$this->message('Unable to find field type ' .$fset['type']);
         		continue;
         	}
         	//set attrbs for all type of fields
-			$field->label =$fset['label'];
+			$field->label = $fset['label'];
 			$field->columnWidth = (intval($fset['width']) >=10) ? $fset['width'] : 100;
+			$field->description = $fset['description'];
+
+			//------- NEW --------
+
+			// Placeholder
+			$field->placeholder = isset($fset['placeholder']) ? $fset['placeholder'] : '';
+
+			// Collapsed
+			if(isset($fset['collapsed']) && $fset['collapsed'] != 'Default') {
+				if($fset['collapsed'] == 'collapsedNever') $field->collapsed = Inputfield::collapsedNever;
+				if($fset['collapsed'] == 'collapsedBlank') $field->collapsed = Inputfield::collapsedBlank;
+				if($fset['collapsed'] == 'collapsedYes') $field->collapsed = Inputfield::collapsedYes;
+			}
+
+			// Markup
+        	if ($fset['type'] == 'Markup') {
+				$field->markupText = '<p>' . $fset['description'] . '</p>';
+				$field->description = '';
+        	}
+
+        	//------- END NEW --------
 
         	if ($fset['type'] == 'Checkbox') {
 				$field->uncheckedValue = '0';
         		if($value === '1') {
         			$field->setAttribute('checked', 'checked'); 
         		}
-        	} 
+        	}
         	if ($fset['type'] == 'URL') {
 				$field->set('noRelative', 1);
 			}
@@ -164,7 +195,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 					if ($value == $v) {
 						$field->addOption($v, $label, array('selected' => 1));
 					} else {
-						$field->addOption($v, $label);						
+						$field->addOption($v, $label);
 					}
 				}
 			}
@@ -174,17 +205,30 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 
 			//fieldset or normal field
 			if ($fset['type'] == 'Fieldset') {
-				$field->description = $fset['description'];
 				$field->addClass('fset_red');
 				$parent = $field;
 				$form->append($field);
 			} else {
  	        	$field->attr('name', $fset['api']);
-	        	$field->notes = $fset['description'];
 	        	$field->attr('value', $value); 
 	        	$parent->append($field);
 	        }
+
 		}
+
+		// $f = $this->modules->get('InputfieldTextarea'); 
+		// $f->label = __('Export/Backup These Settings'); 
+		// $f->attr('name+id', 'export_settings'); 
+		// $f->attr('value', $this->data['settings']); 
+		// $f->collapsed = Inputfield::collapsedYes;
+		// $form->add($f);
+
+		// $f = $this->modules->get('InputfieldTextarea'); 
+		// $f->label = __('Import/Restore Settings'); 
+		// $f->attr('name', 'import_settings'); 
+		// $f->attr('value', isset($this->data['import_settings']) ? $this->data['import_settings'] : '' );
+		// $f->collapsed = Inputfield::collapsedYes;
+		// $form->add($f);
 
 		$f = $this->modules->get('InputfieldSubmit'); 
 		$f->attr('name', 'submit_save'); 
@@ -202,6 +246,12 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 	 * 
 	 */
 	protected function saveValues() {
+
+		// if($this->wire('input')->post->import_settings != '') {
+		// 	$this->message('Site settings restored');
+		// 	return $this->wire('input')->post->import_settings;
+		// }
+
 		$old = $this->data;
 		$data = json_decode($old['settings'], true);
 		$new = array();
@@ -220,8 +270,15 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 		$options = array();
 		$values = array();
 		$json = (isset( $data['settings'] )) ? json_decode($data['settings'], true) : '';
+
+		// if(isset($data['settings_import']) && $data['settings_import'] != '') {
+		// 	$json = json_decode($data['settings_import'], true);
+		// 	$data['settings'] = $data['settings_import'];
+		// 	$data['settings_import'] = '';
+		// }
+
 		foreach ($json as $key => $value) {
-			if ($value['type'] == 'Fieldset') {
+			if ($value['type'] == 'Fieldset' || $value['type'] == 'FieldsetClose') {
 				$options[$value['api']] ='-- '. $value['label'] . ' -- ' . $value['width'] . '%';
 			} else {
 				$options[$value['api']] = $value['label'] . ' ('. $value['api'] .') - ' . $value['width'] . '%';
@@ -233,6 +290,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
         $fields = new InputfieldWrapper();
         $modules = wire('modules');
 
+        //------------------------------------------
         $field = $modules->get("InputfieldMarkup");
         $field->label = __("Help", __FILE__);
         $help = ('<b>API variable</b> - Any combination of letters (a-z), numbers (0-9) and underscores (no spaces). 
@@ -248,6 +306,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
         $field->collapsed = Inputfield::collapsedYes;
         $fields->append($field);
 
+        //------------------------------------------
         $field = $modules->get("InputfieldText");
         $field->attr('name', 'global');
         $field->label = __("Global name", __FILE__);
@@ -257,14 +316,26 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
         $field->collapsed = Inputfield::collapsedYes;
         $fields->append($field);
 
+        //------------------------------------------
         $field = wire('modules')->get("InputfieldTextarea");
         $field->attr('name', 'settings');
         $field->attr('id', 'settings');
         $field->label = __("Json data", __FILE__);
         $field->attr('value', $data['settings']); 
         $field->columnWidth = 34;
+        $field->collapsed = Inputfield::collapsedYes;
         $fields->append($field);
 
+        //------------------------------------------
+        // $field = wire('modules')->get("InputfieldTextarea");
+        // $field->attr('name', 'settings_import');
+        // $field->attr('id', 'settings_import');
+        // $field->label = __("Import Settings Config", __FILE__);
+        // $field->attr('value', $data['settings_import']); 
+        // $field->collapsed = Inputfield::collapsedYes;
+        // $fields->append($field);
+
+        //------------------------------------------
 	   	$field = $modules->get("InputfieldAsmSelect");
         $field->attr('name', 'order');
         $field->attr('id', 'ASMOrder');
@@ -272,6 +343,7 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
         $field->addOptions($options);
         $field->attr('value', $values); 
         $fields->append($field);
+
 
         return $fields;
     }

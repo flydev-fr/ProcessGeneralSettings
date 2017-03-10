@@ -10,9 +10,12 @@ $(window).load(function() {
       	+'<label for="label">Label</label><input type="text" name="label" id="label" value="" required class="text ui-widget-content ui-corner-all"><br>'
         +'<label for="type">Type</label><select type="text" name="type" id="type" class="text ui-widget-content ui-corner-all">'
         +'<option>Text</option><option>Textarea</option><option>Select</option><option>Radios</option><option>Checkbox</option><option>Integer</option><option>Float</option>'
-        +'<option>URL</option><option>Email</option><option>Fieldset</option></select><br>'
+        +'<option>URL</option><option>Email</option><option>Fieldset</option><option>FieldsetClose</option><option>Markup</option></select><br>'
         +'<label for="width">Width in %</label><input type="number" max="100" min="10" name="width" id="width" value="100" class="text ui-widget-content ui-corner-all"><br>'
         +'<label for="description">Description</label><input type="text" name="description" id="description" value="" class="text ui-widget-content ui-corner-all"><br>'
+        +'<label for="placeholder">Placeholder</label><input type="text" name="placeholder" id="placeholder" value="" class="text ui-widget-content ui-corner-all"><br>'
+        +'<label for="collapsed">Collapsed</label><select type="text" name="collapsed" id="collapsed" class="text ui-widget-content ui-corner-all">'
+        +'<option>Default</option><option>collapsedNever</option><option>collapsedBlank</option><option>collapsedYes</option></select><br>'
         +'<label id="select-label" for="select">Comma separated options for select</label><input type="text" name="select" id="select" value="" class="text ui-widget-content ui-corner-all"><br>'
       	+' <!-- Allow form submission with keyboard without duplicating the dialog button --><input type="submit" tabindex="-1" style="position:absolute; top:-1000px">'
     	+'</fieldset></form>');
@@ -53,6 +56,12 @@ $(window).load(function() {
 	    	$(form).find('#width').val(moduleData[asmList[asmID]].width);
 	    	$(form).find('#description').val(moduleData[asmList[asmID]].description);
 	    	$(form).find('#select').val(moduleData[asmList[asmID]].select);
+
+	    	// ------- NEW ------
+	    	$(form).find('#collapsed').val(moduleData[asmList[asmID]].collapsed);
+	    	$(form).find('#placeholder').val(moduleData[asmList[asmID]].placeholder);
+	    	// ------- NEW ------
+
 	    	select($('#type').val());
 	    }
 
@@ -90,10 +99,18 @@ $(window).load(function() {
 				var width = $(form).find('#width').attr('value');
 				//change label of asm select item
 				var label = $(form).find('#label').attr('value');
+
+				//------- NEW --------
+				var collapsed = $(form).find('#collapsed').attr('value');
+				var placeholder = $(form).find('#placeholder').attr('value');
+				//------- NEW --------
+
+
+				console.log(type);
 				var fullLabel = '';
-				if (type == 'Fieldset') {
+				if (type == 'Fieldset' || type == 'FieldsetClose') {
 					fullLabel = '-- '+label +' -- ' + width+'%';
-				} else {	
+				} else {
 					fullLabel = label +' (' +api +') - '+ width+'%';
 				}
 				$('li[rel="'+asmID +'"] .asmListItemLabel').text(fullLabel);
@@ -107,6 +124,13 @@ $(window).load(function() {
 				moduleData[asmList[asmID]].width = width;
 				moduleData[asmList[asmID]].description = $(form).find('#description').attr('value');
 				moduleData[asmList[asmID]].select = $(form).find('#select').attr('value');
+
+				//------- NEW --------
+				moduleData[asmList[asmID]].collapsed = collapsed;
+				moduleData[asmList[asmID]].placeholder = placeholder;
+				//------- NEW --------
+
+
 	        	dialog.dialog( "close" );
 	      	}
 	      	return valid;
@@ -128,6 +152,11 @@ $(window).load(function() {
 	    			$(form).find('#width').val('100');
 	    			$(form).find('#description').val('');
 	    			$(form).find('#select').val('');
+
+	    			// ------ NEW
+	    			$(form).find('#collapsed').val('');
+	    			$(form).find('#placeholder').val('');
+	    			// ------ NEW
 	      		}
 	    	});
 	    }
