@@ -13,81 +13,48 @@
  *
  */
 
-class ProcessGeneralSettings extends Process implements Module, ConfigurableModule {
+class ProcessGeneralSettings extends Process implements Module {
 
 	public static function getModuleInfo() {
 		return array(
-			'title' => __('General site settings', __FILE__),
-			'summary' => __('Module that stores global site settings', __FILE__),
+			'title' => __('General site settings (Edit Page)', __FILE__),
+			'summary' => __('Module that allows editing of global site settings', __FILE__),
 			'version' => 121,
 			'permanent' => false, 
 			'autoload' => true,
 			'icon' => 'sliders', 
+			'requires' => 'GeneralSettings',
 			'page' => array(
 				'name' => 'general_settings',
 				'parent' => 'setup',
 				'title' => 'General settings',
 				),
+			'permission' => 'general-settings',
+			"permissions" => ["general-settings" => "Access general settings page"],
 			);
 	}
 
-	protected static $defaults = array(
-			'global' => 'g_settings',
-			'settings' => '{"0":{"api":"title","label":"Your site title","type":"Text","width":"100","description":"","select":""}}',
-	);
+	//protected static $data;
 
+	/**
+	 * Initialize
+	 *
+	 */
 
 	public function init() {
+		$this->data = $this->modules->getConfig('GeneralSettings');
+	}
+
+
+	public function ___execute() {
+
 		//load styles for backend
 		if ($this->wire('user')->isLoggedin() && $this->input->get('name') == __CLASS__) {
 			$root = $this->config->urls->siteModules . __CLASS__;
         	$this->config->styles->prepend($root . '/' . 'SettingsStyles.css');
         	$this->config->scripts->add($root . '/' . 'SettingsJS.js');
         }
-		//register wire 'global'
-		if (isset($this->data['global'])) {
-			$this->wire($this->data['global'], $this);
-		}
 
-		if (!isset($this->data['settings'])) {
-			parent::init();
-			return;
-		}
-
-		//set api as key with value as value
-		//it makes it callable $settings->key
-		$langData = array();
-		$data = json_decode($this->data['settings'], true);
-		foreach ($data as $key => $field) {
-			if (!isset($field['api'])) continue;
-
-			$value = (isset($field['value']) ? $field['value'] : '');
-			if ($field['type'] == 'Textarea') {
-				$value = nl2br($value);
-			}
-
-			if ($this->user->language) {
-				//if api ends with language name: site_name_polish, add its value to langData array
-				//so if user language is polish calling site_name will return its polish value
-				if (strpos($field['api'], '_'.$this->user->language->name) !== false) {
-					//$api without language suffix - site_title
-					$api = str_replace('_'.$this->user->language->name, '', $field['api']);
-					foreach ($data as $k => $f) {
-						if ($f['api'] === $api) {
-							$langData[$api] = $field['value'];
-						}
-					}
-				}
-			}
-			$this->set($field['api'], $value);
-		}
-		foreach ($langData as $key => $value) {
-			$this->set($key, $value);
-		}
-		parent::init();
-	}
-
-	public function ___execute() {
 		if ($this->input->post('submit_save')) {
 			return $this->renderForm($this->saveValues());
 			//wire('session')->redirect(wire('page')->url);
@@ -97,32 +64,13 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 	}
 
 	/**
-	 * Render all settings with basic markup
-	 * 
-	 * @return string markup
-	 *
-	 */
-	public function render() {
-		$out = '<p>';
-		foreach (json_decode($this->data['settings'], true) as $key => $field) {
-			if (isset($field['api']) && $field['type'] != 'Fieldset') {
-				$v = (isset($field['value'])) ? $field['value'] : '';
-				$out .= $this->wire('sanitizer')->entities($field['label'])
-					. ' ('. $field['api'] . ') => ' 
-					. nl2br($this->wire('sanitizer')->entities($v)) . '<br>';
-			}
-		}
-		return $out .'</p>';
-	}
-
-	/**
 	 * Render form for admin page
 	 * 
 	 * @return string form markup
 	 *
 	 */
 	protected function renderForm($settings=null) {
-		//bd($this->data);
+
 		if (!isset($this->data['settings'])) {
 			return 'Create settings in module configuration first.';
 		}
@@ -247,11 +195,6 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 	 */
 	protected function saveValues() {
 
-		// if($this->wire('input')->post->import_settings != '') {
-		// 	$this->message('Site settings restored');
-		// 	return $this->wire('input')->post->import_settings;
-		// }
-
 		$old = $this->data;
 		$data = json_decode($old['settings'], true);
 		$new = array();
@@ -260,91 +203,11 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 			$new[$key]['value'] = $this->wire('input')->{$field['api']};
 		}
 		$old['settings'] = json_encode($new);
-		wire('modules')->saveModuleConfigData($this, $old); 
+		//wire('modules')->saveModuleConfigData($this, $old); 
+		wire('modules')->saveConfig('GeneralSettings', $old);
 		$this->message('Site settings saved');	
 		return $old['settings'];
 	}
 
-	static public function getModuleConfigInputfields(array $data) {
-		$data = array_merge(self::$defaults, $data);
-		$options = array();
-		$values = array();
-		$json = (isset( $data['settings'] )) ? json_decode($data['settings'], true) : '';
 
-		// if(isset($data['settings_import']) && $data['settings_import'] != '') {
-		// 	$json = json_decode($data['settings_import'], true);
-		// 	$data['settings'] = $data['settings_import'];
-		// 	$data['settings_import'] = '';
-		// }
-
-		foreach ($json as $key => $value) {
-			if ($value['type'] == 'Fieldset' || $value['type'] == 'FieldsetClose') {
-				$options[$value['api']] ='-- '. $value['label'] . ' -- ' . $value['width'] . '%';
-			} else {
-				$options[$value['api']] = $value['label'] . ' ('. $value['api'] .') - ' . $value['width'] . '%';
-			}
-			$values[] = $value['api'];
-		}
-
-		$order = array();
-        $fields = new InputfieldWrapper();
-        $modules = wire('modules');
-
-        //------------------------------------------
-        $field = $modules->get("InputfieldMarkup");
-        $field->label = __("Help", __FILE__);
-        $help = ('<b>API variable</b> - Any combination of letters (a-z), numbers (0-9) and underscores (no spaces). 
-        		You can call it in template files to output a value ($settings->site_name will return "My site").
-        		<br>IMPORTANT: take care to not overload ProcessWire properties ($page, $user, etc.). It must be unique across all settings.<br>
-        		<b>Label</b> - descriptive name for a backend user<br>
-        		<b>Description</b> - longer explanation shown as notes in ProcessWire backend<br>
-        		<b>Width</b> - field width in %, set between 10 and 100<br>
-        		<b>Options for select or radios</b> - this will be used as names and labels, the best one word only');
-        $field->entityEncodeText = false;
-        $field->entityEncodeLabel = false;
-        $field->attr('value', $help); 
-        $field->collapsed = Inputfield::collapsedYes;
-        $fields->append($field);
-
-        //------------------------------------------
-        $field = $modules->get("InputfieldText");
-        $field->attr('name', 'global');
-        $field->label = __("Global name", __FILE__);
-        $field->attr('value', $data['global']); 
-        $field->description = __('Use to call settings property in frontend ($settings->property).', __FILE__);
-        $field->notes = __("After changing make sure to change it in your template files.", __FILE__);
-        $field->collapsed = Inputfield::collapsedYes;
-        $fields->append($field);
-
-        //------------------------------------------
-        $field = wire('modules')->get("InputfieldTextarea");
-        $field->attr('name', 'settings');
-        $field->attr('id', 'settings');
-        $field->label = __("Json data", __FILE__);
-        $field->attr('value', $data['settings']); 
-        $field->columnWidth = 34;
-        $field->collapsed = Inputfield::collapsedYes;
-        $fields->append($field);
-
-        //------------------------------------------
-        // $field = wire('modules')->get("InputfieldTextarea");
-        // $field->attr('name', 'settings_import');
-        // $field->attr('id', 'settings_import');
-        // $field->label = __("Import Settings Config", __FILE__);
-        // $field->attr('value', $data['settings_import']); 
-        // $field->collapsed = Inputfield::collapsedYes;
-        // $fields->append($field);
-
-        //------------------------------------------
-	   	$field = $modules->get("InputfieldAsmSelect");
-        $field->attr('name', 'order');
-        $field->attr('id', 'ASMOrder');
-        $field->label = __("Settings", __FILE__);
-        $field->addOptions($options);
-        $field->attr('value', $values); 
-        $fields->append($field);
-
-
-        return $fields;
-    }
 }
