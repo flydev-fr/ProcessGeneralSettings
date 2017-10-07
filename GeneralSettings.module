@@ -6,10 +6,10 @@
  * Allows to set global site settings 
  *
  * by Piotr Markiewicz (pmarki)
+ * 
+ * Additional revisions by Marc Wolf (@macrura)
  *
- * ProcessWire 2.8.x (development), Copyright 2016 by Ryan Cramer
  * https://processwire.com
- *
  *
  */
 
@@ -17,12 +17,13 @@ class GeneralSettings extends Process implements Module, ConfigurableModule {
 
 	public static function getModuleInfo() {
 		return array(
-			'title' => __('General site settings', __FILE__),
-			'summary' => __('Module that stores global site settings', __FILE__),
-			'version' => 121,
+			'title' 	=> __('General Site Settings', __FILE__),
+			'summary' 	=> __('Configurble module that stores a variety of global site settings', __FILE__),
+			'version' 	=> 122,
 			'permanent' => false, 
-			'autoload' => true,
-			'icon' => 'sliders', 
+			'autoload' 	=> false,
+			'icon' 		=> 'sliders', 
+			'installs'	=> 'ProcessGeneralSettings',
 			);
 	}
 
@@ -75,7 +76,16 @@ class GeneralSettings extends Process implements Module, ConfigurableModule {
 			$this->set($key, $value);
 		}
 		parent::init();
+
+		if ($this->wire('user')->isLoggedin() && $this->input->get('name') == __CLASS__) {
+			$root = $this->config->urls->siteModules . 'ProcessGeneralSettings'; // parent module – this should be adjusted
+        	$this->config->styles->prepend($root . '/' . 'Settings.css');
+        	$this->config->scripts->add($root . '/' . 'Settings.js');
+        }
+
+
 	}
+
 
 	/**
 	 * Render all settings with basic markup
@@ -102,6 +112,12 @@ class GeneralSettings extends Process implements Module, ConfigurableModule {
 		$options = array();
 		$values = array();
 		$json = (isset( $data['settings'] )) ? json_decode($data['settings'], true) : '';
+
+		if(isset($data['settings_import']) && $data['settings_import'] != '') {
+			$json = json_decode($data['settings_import'], true);
+			$data['settings'] = $data['settings_import'];
+			$data['settings_import'] = '';
+		}
 
 		foreach ($json as $key => $value) {
 			if ($value['type'] == 'Fieldset' || $value['type'] == 'FieldsetClose') {
@@ -151,6 +167,18 @@ class GeneralSettings extends Process implements Module, ConfigurableModule {
         $field->columnWidth = 34;
         $field->collapsed = Inputfield::collapsedYes;
         $fields->append($field);
+
+
+        //------------------------------------------
+        $field = wire('modules')->get("InputfieldTextarea");
+        $field->attr('name', 'settings_import');
+        $field->attr('id', 'settings_import');
+        $field->label = __("Import Settings Config", __FILE__);
+        $field->description = __('Paste a JSON array of settings here - Warning - pasting here will clear all saved settings in the Process Module.', __FILE__);
+        $field->attr('value', $data['settings_import']); 
+        $field->collapsed = Inputfield::collapsedYes;
+        $fields->append($field);
+
 
         //------------------------------------------
 	   	$field = $modules->get("InputfieldAsmSelect");

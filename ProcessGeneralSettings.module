@@ -17,15 +17,15 @@ class ProcessGeneralSettings extends Process implements Module {
 
 	public static function getModuleInfo() {
 		return array(
-			'title' => __('General site settings (Edit Page)', __FILE__),
-			'summary' => __('Module that allows editing of global site settings', __FILE__),
-			'version' => 121,
+			'title' => __('General site settings (Process)', __FILE__),
+			'summary' => __('Editing of global site settings, setup in General Settings Module', __FILE__),
+			'version' => 122,
 			'permanent' => false, 
 			'autoload' => true,
 			'icon' => 'sliders', 
 			'requires' => 'GeneralSettings',
 			'page' => array(
-				'name' => 'general_settings',
+				'name' => 'general-settings',
 				'parent' => 'setup',
 				'title' => 'General settings',
 				),
@@ -33,8 +33,6 @@ class ProcessGeneralSettings extends Process implements Module {
 			"permissions" => ["general-settings" => "Access general settings page"],
 			);
 	}
-
-	//protected static $data;
 
 	/**
 	 * Initialize
@@ -47,13 +45,6 @@ class ProcessGeneralSettings extends Process implements Module {
 
 
 	public function ___execute() {
-
-		//load styles for backend
-		if ($this->wire('user')->isLoggedin() && $this->input->get('name') == __CLASS__) {
-			$root = $this->config->urls->siteModules . __CLASS__;
-        	$this->config->styles->prepend($root . '/' . 'SettingsStyles.css');
-        	$this->config->scripts->add($root . '/' . 'SettingsJS.js');
-        }
 
 		if ($this->input->post('submit_save')) {
 			return $this->renderForm($this->saveValues());
@@ -136,7 +127,9 @@ class ProcessGeneralSettings extends Process implements Module {
         	if ($fset['type'] == 'URL') {
 				$field->set('noRelative', 1);
 			}
-			if ($fset['type'] == 'Select' || $fset['type'] == 'Radios') {
+
+			// enabled use of checkboxes
+			if ($fset['type'] == 'Select' || $fset['type'] == 'Radios' || $fset['type'] == 'Checkboxes') {
 				foreach (explode(',', trim($fset['select'], ',')) as $label) {
 					//value, label, attr
 					$v = $this->wire('sanitizer')->name($label);
@@ -164,19 +157,6 @@ class ProcessGeneralSettings extends Process implements Module {
 
 		}
 
-		// $f = $this->modules->get('InputfieldTextarea'); 
-		// $f->label = __('Export/Backup These Settings'); 
-		// $f->attr('name+id', 'export_settings'); 
-		// $f->attr('value', $this->data['settings']); 
-		// $f->collapsed = Inputfield::collapsedYes;
-		// $form->add($f);
-
-		// $f = $this->modules->get('InputfieldTextarea'); 
-		// $f->label = __('Import/Restore Settings'); 
-		// $f->attr('name', 'import_settings'); 
-		// $f->attr('value', isset($this->data['import_settings']) ? $this->data['import_settings'] : '' );
-		// $f->collapsed = Inputfield::collapsedYes;
-		// $form->add($f);
 
 		$f = $this->modules->get('InputfieldSubmit'); 
 		$f->attr('name', 'submit_save'); 
@@ -203,11 +183,11 @@ class ProcessGeneralSettings extends Process implements Module {
 			$new[$key]['value'] = $this->wire('input')->{$field['api']};
 		}
 		$old['settings'] = json_encode($new);
-		//wire('modules')->saveModuleConfigData($this, $old); 
 		wire('modules')->saveConfig('GeneralSettings', $old);
 		$this->message('Site settings saved');	
 		return $old['settings'];
 	}
+
 
 
 }
