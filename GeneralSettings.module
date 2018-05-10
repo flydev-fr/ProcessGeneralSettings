@@ -21,7 +21,7 @@ class GeneralSettings extends Process implements Module, ConfigurableModule {
 			'summary' 	=> __('Configurble module that stores a variety of global site settings', __FILE__),
 			'version' 	=> 122,
 			'permanent' => false, 
-			'autoload' 	=> false,
+			'autoload' 	=> true,
 			'icon' 		=> 'sliders', 
 			'installs'	=> 'ProcessGeneralSettings',
 			);
@@ -82,7 +82,6 @@ class GeneralSettings extends Process implements Module, ConfigurableModule {
         	$this->config->styles->prepend($root . '/' . 'Settings.css');
         	$this->config->scripts->add($root . '/' . 'Settings.js');
         }
-
 
 	}
 
