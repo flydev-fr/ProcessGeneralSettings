@@ -1,0 +1,503 @@
+[ {
+	"api": "help_text",
+	"label": "Info",
+	"type": "Markup",
+	"width": "100",
+	"description": "This is some instructions.",
+	"select": "",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": null
+}, {
+	"api": "title",
+	"label": "Site title",
+	"type": "Text",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": "Sammy's Beef Salon"
+}, {
+	"api": "homepage_title",
+	"label": "Homepage Title",
+	"type": "Text",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"collapsed": "collapsedNever",
+	"placeholder": "My Wonderful Site",
+	"value": "Sammy's Beef Salon |  Westchester\u2019s Premier Beef Place | (914) 222-5541"
+}, {
+	"api": "index_status",
+	"label": "Index Status",
+	"type": "Select",
+	"width": "50",
+	"description": "Block robots from indexing this site?",
+	"select": "allow,block",
+	"value": "allow",
+	"collapsed": "Default",
+	"placeholder": ""
+}, {
+	"api": "site_status",
+	"label": "Site Status",
+	"type": "Select",
+	"width": "50",
+	"description": "The option selected here may affect how some elements of your site are rendered on the front end.",
+	"select": "dev,beta,staging,live",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": "dev"
+}, {
+	"api": "themeOptions",
+	"label": "Theme Options",
+	"type": "Fieldset",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": null
+}, {
+	"api": "logo_left",
+	"label": "Logo Left",
+	"type": "Text",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": ""
+}, {
+	"api": "logo_sub",
+	"label": "Logo Subtitle",
+	"type": "Text",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"collapsed": "collapsedBlank",
+	"placeholder": "",
+	"value": ""
+}, {
+	"api": "theme_color",
+	"label": "Theme Color",
+	"type": "Select",
+	"width": "100",
+	"description": "This is the main theme color - leave unset to use the default aqua color.",
+	"select": "Blue,Red,Yellow,Dark",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": "Red"
+}, {
+	"api": "preheader_show",
+	"label": "Show Top Strip",
+	"type": "Checkbox",
+	"width": "50",
+	"description": "Checking this will enable the pre header.",
+	"select": "",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": "1"
+}, {
+	"api": "top_strip_color",
+	"label": "Top Strip Color",
+	"type": "Radios",
+	"width": "50",
+	"description": "",
+	"select": "Black,White",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": "Black"
+}, {
+	"api": "top_strip_left",
+	"label": "Top Strip Left",
+	"type": "Checkboxes",
+	"width": "50",
+	"description": "Items to show in top strip (left)",
+	"select": "Address,Phone,Social Icons,Top Menu,",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": [ "Address", "Phone" ]
+}, {
+	"api": "top_strip_right",
+	"label": "Top Strip Right",
+	"type": "Checkboxes",
+	"width": "50",
+	"description": "Items to show in top strip (right)",
+	"select": "Address,Phone,Social Icons,Top Menu",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": [ "Social_Icons" ]
+}, {
+	"api": "header_socials",
+	"label": "Top Socials",
+	"type": "Checkboxes",
+	"width": "100",
+	"description": "Socials to show in top strip (if enabled)",
+	"select": "facebook,twitter,instagram,yelp,google,pinterest",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": [ "facebook", "twitter", "instagram", "google", "pinterest" ]
+}, {
+	"api": "footer_text",
+	"label": "Footer Text",
+	"type": "Textarea",
+	"width": "100",
+	"description": "This is the text below the logo.",
+	"select": "",
+	"collapsed": "collapsedBlank",
+	"placeholder": "",
+	"value": ""
+}, {
+	"api": "logo_mobile",
+	"label": "Mobile Logo",
+	"type": "PageListSelect",
+	"width": "100",
+	"description": "Select the media page holding the Mobile Logo",
+	"select": "",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": "1307"
+}, {
+	"api": "themeoptionsClose",
+	"label": "Close Theme Options",
+	"type": "FieldsetClose",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": null
+}, {
+	"api": "location",
+	"label": "Company Information",
+	"type": "Fieldset",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": null,
+	"collapsed": "collapsedYes",
+	"placeholder": ""
+}, {
+	"api": "company",
+	"label": "Company (name)",
+	"type": "Text",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "address",
+	"label": "Address",
+	"type": "Textarea",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "geo_tags",
+	"label": "Geo Tags",
+	"type": "Textarea",
+	"width": "100",
+	"description": "You can generate your site's [geo tags](http:\/\/www.geo-tag.de\/generator\/en.html) and paste the resulting code here.",
+	"select": "",
+	"collapsed": "collapsedBlank",
+	"placeholder": "",
+	"value": ""
+}, {
+	"api": "gmap_apikey",
+	"label": "Google Maps API Key",
+	"type": "Text",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": ""
+}, {
+	"api": "phone",
+	"label": "Phone",
+	"type": "Text",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "email",
+	"label": "Email",
+	"type": "Email",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "company_url",
+	"label": "Company URL",
+	"type": "URL",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "copy_start",
+	"label": "Copyright Start",
+	"type": "Integer",
+	"width": "30",
+	"description": "The year for the copyright start",
+	"select": "",
+	"value": "1971"
+}, {
+	"api": "copyright_holder",
+	"label": "Copyright Holder",
+	"type": "Text",
+	"width": "70",
+	"description": "The owner of the \u00a9",
+	"select": "",
+	"value": ""
+}, {
+	"api": "social_media",
+	"label": "Social Media",
+	"type": "Fieldset",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": null,
+	"collapsed": "collapsedYes",
+	"placeholder": ""
+}, {
+	"api": "twitter_handle",
+	"label": "Twitter Handle",
+	"type": "Text",
+	"width": "100",
+	"description": "Enter the twitter handle (without the @)",
+	"select": "",
+	"value": ""
+}, {
+	"api": "twitter_url",
+	"label": "Twitter URL",
+	"type": "URL",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "facebook",
+	"label": "Facebook",
+	"type": "URL",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "fb_app_id",
+	"label": "Facebook App ID",
+	"type": "Text",
+	"width": "100",
+	"description": "You must provide an app id for your Facebook App.",
+	"select": "",
+	"collapsed": "collapsedBlank",
+	"placeholder": "",
+	"value": ""
+}, {
+	"api": "instagram",
+	"label": "Instagram",
+	"type": "URL",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "yelp",
+	"label": "Yelp",
+	"type": "URL",
+	"width": "100",
+	"description": "Enter the URL of the Yelp page.",
+	"select": "",
+	"collapsed": "collapsedBlank",
+	"placeholder": "",
+	"value": ""
+}, {
+	"api": "pinterest",
+	"label": "Pinterest",
+	"type": "URL",
+	"width": "100",
+	"description": "Pinterest URL",
+	"select": "",
+	"collapsed": "collapsedBlank",
+	"placeholder": "",
+	"value": ""
+}, {
+	"api": "google_plus",
+	"label": "Google Plus",
+	"type": "URL",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "google_pubid",
+	"label": "Google Publisher ID",
+	"type": "Integer",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"collapsed": "collapsedBlank",
+	"placeholder": "",
+	"value": ""
+}, {
+	"api": "ga_id",
+	"label": "Google Analytics Site ID",
+	"type": "Text",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "primary_schema",
+	"label": "Primary Schema",
+	"type": "Fieldset",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": null,
+	"collapsed": "Default",
+	"placeholder": ""
+}, {
+	"api": "dc_publisher",
+	"label": "Dublin Core Publisher",
+	"type": "Text",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"collapsed": "collapsedBlank",
+	"placeholder": "",
+	"value": ""
+}, {
+	"api": "dc_creator",
+	"label": "Dublin Core Creator",
+	"type": "Text",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "schemaType",
+	"label": "Schema Type",
+	"type": "Text",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": "",
+	"collapsed": "collapsedBlank",
+	"placeholder": ""
+}, {
+	"api": "streetAddress",
+	"label": "Street Address",
+	"type": "Text",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "addressLocality",
+	"label": "Address Locality",
+	"type": "Text",
+	"width": "40",
+	"description": "Name of town",
+	"select": "",
+	"value": ""
+}, {
+	"api": "addressRegion",
+	"label": "Address Region",
+	"type": "Text",
+	"width": "20",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "postalCode",
+	"label": "Postal Code",
+	"type": "Text",
+	"width": "20",
+	"description": "",
+	"select": "",
+	"value": ""
+}, {
+	"api": "areas_served",
+	"label": "Areas Served",
+	"type": "Textarea",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"collapsed": "collapsedBlank",
+	"placeholder": "",
+	"value": ""
+}, {
+	"api": "primary_schema_END",
+	"label": "Close Primary Schema",
+	"type": "FieldsetClose",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": null
+}, {
+	"api": "fs_credits",
+	"label": "Credits",
+	"type": "Fieldset",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"collapsed": "collapsedYes",
+	"placeholder": "",
+	"value": null
+}, {
+	"api": "show_poweredby",
+	"label": "Show Powered By",
+	"type": "Checkbox",
+	"width": "100",
+	"description": "Check this to enable the Processwire link in the footer",
+	"select": "",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": "1"
+}, {
+	"api": "show_designer",
+	"label": "Show designer credit",
+	"type": "Checkbox",
+	"width": "100",
+	"description": "Check this to show the designer credit in the footer",
+	"select": "",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": "1"
+}, {
+	"api": "site_by_url",
+	"label": "Site By (url)",
+	"type": "URL",
+	"width": "50",
+	"description": "",
+	"select": "",
+	"value": "",
+	"collapsed": "Default",
+	"placeholder": ""
+}, {
+	"api": "site_by",
+	"label": "Site By",
+	"type": "Text",
+	"width": "50",
+	"description": "For credits",
+	"select": "",
+	"value": "",
+	"collapsed": "Default",
+	"placeholder": ""
+}, {
+	"api": "fs_credits_CLOSE",
+	"label": "Close credits",
+	"type": "FieldsetClose",
+	"width": "100",
+	"description": "",
+	"select": "",
+	"collapsed": "Default",
+	"placeholder": "",
+	"value": null
+} ]
