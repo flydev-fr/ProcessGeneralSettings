@@ -11,6 +11,9 @@
  *
  * https://processwire.com
  *
+ * http://modules.processwire.com/modules/process-general-settings/
+ * https://github.com/flydev-fr/ProcessGeneralSettings
+ * 
  */
 
 class GeneralSettings extends Process implements Module, ConfigurableModule {
@@ -34,6 +37,14 @@ class GeneralSettings extends Process implements Module, ConfigurableModule {
 
 
 	public function init() {
+
+		parent::init();
+
+		if ($this->wire('user')->isLoggedin() && $this->input->get('name') == __CLASS__) {
+			$root = $this->config->urls->siteModules . 'ProcessGeneralSettings'; // parent module – this should be adjusted
+        	$this->config->styles->prepend($root . '/' . 'Settings.css');
+        	$this->config->scripts->add($root . '/' . 'Settings.js');
+        }
 
 		//register wire 'global'
 		if (isset($this->data['global'])) {
@@ -75,13 +86,7 @@ class GeneralSettings extends Process implements Module, ConfigurableModule {
 		foreach ($langData as $key => $value) {
 			$this->set($key, $value);
 		}
-		parent::init();
 
-		if ($this->wire('user')->isLoggedin() && $this->input->get('name') == __CLASS__) {
-			$root = $this->config->urls->siteModules . 'ProcessGeneralSettings'; // parent module – this should be adjusted
-        	$this->config->styles->prepend($root . '/' . 'Settings.css');
-        	$this->config->scripts->add($root . '/' . 'Settings.js');
-        }
 
 	}
 

@@ -32,8 +32,8 @@ class ProcessGeneralSettings extends Process implements Module, ConfigurableModu
 	}
 
 	protected static $defaults = array(
-			'global' => 'g_settings',
-			'settings' => '{"0":{"api":"title","label":"Your site title","type":"Text","width":"100","description":"","select":""}}',
+		'global' => 'g_settings',
+		'settings' => '{"0":{"api":"title","label":"Your site title","type":"Text","width":"100","description":"","select":""}}',
 	);
 
 
