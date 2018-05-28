@@ -77,23 +77,23 @@ class ProcessGeneralSettings extends Process implements Module {
 		$form->attr('id', 'SettingsModule');
 		$form->attr('action', $this->wire('page')->url );
 
-        $parent = $form;
+		$parent = $form;
 		foreach ($attrs as $fset) {
-        	$field = $this->modules->get('Inputfield'.$fset['type']);
-        	$value = (isset($fset['value']) ? $fset['value'] : '');
+			$field = $this->modules->get('Inputfield'.$fset['type']);
+			$value = (isset($fset['value']) ? $fset['value'] : '');
 
-        	//------- NEW --------
-        	if($fset['type'] == 'FieldsetClose') {
+			//------- NEW --------
+			if($fset['type'] == 'FieldsetClose') {
 				$parent = $form;
 				continue;
 			}
 			//------- END NEW --------
 
-        	if (!$field) {
-        		$this->message('Unable to find field type ' .$fset['type']);
-        		continue;
-        	}
-        	//set attrbs for all type of fields
+			if (!$field) {
+				$this->message('Unable to find field type ' .$fset['type']);
+				continue;
+			}
+			//set attrbs for all type of fields
 			$field->label = $fset['label'];
 			$field->columnWidth = (intval($fset['width']) >=10) ? $fset['width'] : 100;
 			$field->description = $fset['description'];
@@ -111,20 +111,20 @@ class ProcessGeneralSettings extends Process implements Module {
 			}
 
 			// Markup
-        	if ($fset['type'] == 'Markup') {
+			if ($fset['type'] == 'Markup') {
 				$field->markupText = '<p>' . $fset['description'] . '</p>';
 				$field->description = '';
-        	}
+			}
 
-        	//------- END NEW --------
+			//------- END NEW --------
 
-        	if ($fset['type'] == 'Checkbox') {
+			if ($fset['type'] == 'Checkbox') {
 				$field->uncheckedValue = '0';
-        		if($value === '1') {
-        			$field->setAttribute('checked', 'checked'); 
-        		}
-        	}
-        	if ($fset['type'] == 'URL') {
+				if($value === '1') {
+					$field->setAttribute('checked', 'checked'); 
+				}
+			}
+			if ($fset['type'] == 'URL') {
 				$field->set('noRelative', 1);
 			}
 
@@ -150,10 +150,10 @@ class ProcessGeneralSettings extends Process implements Module {
 				$parent = $field;
 				$form->append($field);
 			} else {
- 	        	$field->attr('name', $fset['api']);
-	        	$field->attr('value', $value); 
-	        	$parent->append($field);
-	        }
+				$field->attr('name', $fset['api']);
+				$field->attr('value', $value); 
+				$parent->append($field);
+			}
 
 		}
 
