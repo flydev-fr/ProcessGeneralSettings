@@ -21,12 +21,13 @@ class GeneralSettings extends Process implements Module, ConfigurableModule {
 	public static function getModuleInfo() {
 		return array(
 			'title' 	=> __('General Site Settings', __FILE__),
-			'summary' 	=> __('Configurble module that stores a variety of global site settings', __FILE__),
+			'summary' 	=> __('Configurable module that stores a variety of global site settings', __FILE__),
 			'version' 	=> 122,
 			'permanent' => false, 
 			'autoload' 	=> true,
 			'icon' 		=> 'sliders', 
-			'installs'	=> 'ProcessGeneralSettings',
+			//'installs'	=> 'ProcessGeneralSettings',
+			'requires' 	=> 'ProcessGeneralSettings',
 			);
 	}
 
