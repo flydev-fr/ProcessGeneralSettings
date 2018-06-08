@@ -23,7 +23,8 @@ class ProcessGeneralSettings extends Process implements Module {
 			'permanent' => false, 
 			'autoload' => true,
 			'icon' => 'sliders', 
-			'requires' => 'GeneralSettings',
+			//'requires' => 'GeneralSettings',
+			'installs'	=> 'GeneralSettings',
 			'page' => array(
 				'name' => 'general-settings',
 				'parent' => 'setup',
